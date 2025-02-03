@@ -1,7 +1,7 @@
 Rust Toolchain for L4Re
 =======================
 
-This build the Rust compiler by taking the relevant Rust compiler components
+This builds the Rust compiler by taking the relevant Rust compiler components
 with a few L4Re adoptions.
 
 If you do not want the script to change your Rust environment, call:
@@ -28,7 +28,7 @@ the following:
     $ ./checkout_and_build.sh build-kernel
     $ ./checkout_and_build.sh build-hello
 
-The run it you need to have QEMU installed for the respective target
+For running it you need to have QEMU installed for the respective target
 architectures.
 
     $ ./checkout_and_build.sh run aarch64

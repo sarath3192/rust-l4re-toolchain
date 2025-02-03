@@ -100,23 +100,23 @@ _EOF
   cp l4/mk/defconfig/config.amd64 defconfig-amd64
   echo "CONFIG_COMPILER_RT_USE_TOOLCHAIN_LIBGCC=n" >> defconfig-amd64
   rm -rf build.amd64
-  make -C l4 -j 90 B="$PWD/build.amd64" DROPSCONF_DEFCONFIG="$PWD/defconfig-amd64"
-  make -C build.amd64 -j 90 olddefconfig
-  make -C build.amd64 -j 90
-  make -C build.amd64 -j 90 sysroot
+  make -C l4 -j $(nproc) B="$PWD/build.amd64" DROPSCONF_DEFCONFIG="$PWD/defconfig-amd64"
+  make -C build.amd64 -j $(nproc) olddefconfig
+  make -C build.amd64 -j $(nproc)
+  make -C build.amd64 -j $(nproc) sysroot
   rm build.amd64/pkg/l4re-core/l4re/util/libs/OBJ*std-l4f/lib4re-util*
-  make -C build.amd64/pkg/l4re-core/l4re/util/libs -j 90 DO_THE_INIT_DEPENDENCY_HACK=1
+  make -C build.amd64/pkg/l4re-core/l4re/util/libs -j $(nproc) DO_THE_INIT_DEPENDENCY_HACK=1
   cp build.amd64/pkg/l4re-core/l4re/util/libs/OBJ*std-l4f/lib4re-util* build.amd64/sysroot/usr/lib
 
   cp l4/mk/defconfig/config.arm64-virt-v8a defconfig-arm64
   echo "CONFIG_COMPILER_RT_USE_TOOLCHAIN_LIBGCC=n" >> defconfig-arm64
   rm -rf build.arm64
-  make -C l4 -j 90 B="$PWD/build.arm64" DROPSCONF_DEFCONFIG="$PWD/defconfig-arm64"
-  make -C build.arm64 -j 90 olddefconfig
-  make -C build.arm64 -j 90
-  make -C build.arm64 -j 90 sysroot
+  make -C l4 -j $(nproc) B="$PWD/build.arm64" DROPSCONF_DEFCONFIG="$PWD/defconfig-arm64"
+  make -C build.arm64 -j $(nproc) olddefconfig
+  make -C build.arm64 -j $(nproc)
+  make -C build.arm64 -j $(nproc) sysroot
   rm build.arm64/pkg/l4re-core/l4re/util/libs/OBJ*std-l4f/lib4re-util*
-  make -C build.arm64/pkg/l4re-core/l4re/util/libs -j 90 DO_THE_INIT_DEPENDENCY_HACK=1
+  make -C build.arm64/pkg/l4re-core/l4re/util/libs -j $(nproc) DO_THE_INIT_DEPENDENCY_HACK=1
   cp build.arm64/pkg/l4re-core/l4re/util/libs/OBJ*std-l4f/lib4re-util* build.arm64/sysroot/usr/lib
 
   cd ..
@@ -128,8 +128,8 @@ build_kernel()
   cd fiasco
   make B=build-arm64 T=arm64-virt-el2
   make B=build-amd64 T=amd64-dfl
-  make -C build-arm64 -j90
-  make -C build-amd64 -j90
+  make -C build-arm64 -j $(nproc)
+  make -C build-amd64 -j $(nproc)
   cd -
 }
 

@@ -49,38 +49,19 @@ build_l4re()
   mkdir l4re
   cd l4re
 
-cat >l4re-core.patch <<_EOF
-diff --git a/l4re/util/libs/Makefile b/l4re/util/libs/Makefile
-index e13da5c80..459816a64 100644
+  cat >l4re-core.patch <<_EOF
 --- a/l4re/util/libs/Makefile
 +++ b/l4re/util/libs/Makefile
-@@ -5,7 +5,9 @@ TARGET         = lib4re-util.a lib4re-util.so
- SRC_CC        := cap_alloc.cc debug.cc kumem_alloc.cc
- PC_FILENAME   := l4re-util
- REQUIRES_LIBS := l4re
--
+@@ -7,6 +7,9 @@
+ PC_LIBS       := %{-link-libc:%{shared:--whole-archive -l4re-util.p --no-whole-archive;:lib4re-util.ofl}}
+ PC_LIBS_PIC   :=
+ 
 +# Add dependency on libc.so for lib4re-util.so, to ensure INIT function of
 +# libc/libpthread is called by ldso before lib4re-util.
 +LDFLAGS  += \$(if \$(DO_THE_INIT_DEPENDENCY_HACK),-lc)
  PICFLAGS += -DSHARED=1
  CXXFLAGS += -DL4_NO_RTTI -fno-rtti -fno-exceptions
- 
-_EOF
 
-cat >mk.patch <<_EOF
-diff --git a/Makefile b/Makefile
-index 4f089cf8..8cf6df81 100644
---- a/Makefile
-+++ b/Makefile
-@@ -282,7 +282,7 @@ regen_compile_commands_json:
-
- # Build a typical sysroot for use with external tooling such as a
- # L4Re-specific cross-compiler
--SYSROOT_LIBS = libgcc_s lib4re lib4re-c lib4re-c-util lib4re-util-nortti lib4re-util libc librt libc_be_l4re libc_be_l4refile libc_be_socket_noop libc_be_sig libc_be_sig_noop libc_support_misc libdl libl4re-vfs.o libl4sys libl4util libld-l4 libm_support libpthread libc_nonshared.p libssp_nonshared.p libmount
-+SYSROOT_LIBS = libgcc libgcc_eh libgcc_s lib4re lib4re-c lib4re-c-util lib4re-util-nortti lib4re-util libc librt libc_be_l4re libc_be_l4refile libc_be_socket_noop libc_be_sig libc_be_sig_noop libc_support_misc libdl libl4re-vfs.o libl4sys libl4util libld-l4 libm_support libpthread libc_nonshared.p libssp_nonshared.p libmount
- sysroot: \$(foreach p,l4re l4re_c l4re_vfs l4sys l4util ldso libc_backends uclibc,pkg/l4re-core/\$(p))
-	\$(GEN_MESSAGE)
-	\$(VERBOSE)\$(RM) -r \$(OBJ_DIR)/sysroot
 _EOF
 
   git clone --depth 1 https://github.com/kernkonzept/mk l4
@@ -93,9 +74,6 @@ _EOF
 
   p=$PWD
   (cd l4/pkg/l4re-core && patch -p 1 -i $p/l4re-core.patch)
-  if grep -vq "libgcc libgcc_eh" l4/Makefile; then
-    (cd l4 && patch -p 1 -i $p/mk.patch)
-  fi
 
   cp l4/mk/defconfig/config.amd64 defconfig-amd64
   echo "CONFIG_COMPILER_RT_USE_TOOLCHAIN_LIBGCC=n" >> defconfig-amd64

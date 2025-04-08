@@ -152,13 +152,13 @@ case "$cmd" in
   hookup-toolchain) hookup_toolchain;;
 
   run)
-      case "$2" in
-	x86_64|aarch64) mode=$2;;
-	*) echo "Please specify x86_64 or aarch64"; exit 1;;
-      esac
+    case "$2" in
+      x86_64|aarch64) mode=$2;;
+      *) echo "Please specify x86_64 or aarch64"; exit 1;;
+    esac
 
-      echo 'local L4 = require("L4");' > hello_world.cfg
-      echo 'L4.default_loader:start({}, "rom/hello_world");' >> hello_world.cfg
+    echo 'local L4 = require("L4");' > hello_world.cfg
+    echo 'L4.default_loader:start({}, "rom/hello_world");' >> hello_world.cfg
 
 cat > modules.list <<_EOF
 entry hello_world
@@ -170,10 +170,10 @@ module hello_world.cfg
 module hello_world
 _EOF
 
-      [[ $mode = x86_64  ]] && make -C l4re/build.amd64 qemu E=hello_world MODULES_LIST=$PWD/modules.list MODULE_SEARCH_PATH=$PWD/fiasco/build-amd64:$PWD/hello_world/target/x86_64-unknown-l4re-uclibc/debug:$PWD QEMU_OPTIONS="-vnc :4 -serial stdio -m 1024"
-      [[ $mode = aarch64 ]] && make -C l4re/build.arm64 qemu E=hello_world MODULES_LIST=$PWD/modules.list MODULE_SEARCH_PATH=$PWD/fiasco/build-arm64:$PWD/hello_world/target/aarch64-unknown-l4re-uclibc/debug:$PWD QEMU_OPTIONS="-vnc :4 -serial stdio -m 1024 -M virt,virtualization=true -cpu cortex-a57"
+    [[ $mode = x86_64  ]] && make -C l4re/build.amd64 qemu E=hello_world MODULES_LIST=$PWD/modules.list MODULE_SEARCH_PATH=$PWD/fiasco/build-amd64:$PWD/hello_world/target/x86_64-unknown-l4re-uclibc/debug:$PWD QEMU_OPTIONS="-vnc :4 -serial stdio -m 1024"
+    [[ $mode = aarch64 ]] && make -C l4re/build.arm64 qemu E=hello_world MODULES_LIST=$PWD/modules.list MODULE_SEARCH_PATH=$PWD/fiasco/build-arm64:$PWD/hello_world/target/aarch64-unknown-l4re-uclibc/debug:$PWD QEMU_OPTIONS="-vnc :4 -serial stdio -m 1024 -M virt,virtualization=true -cpu cortex-a57"
 
-      ;;
+    ;;
 
   shell)
     echo "Launch shell with environment set"

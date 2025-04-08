@@ -27,20 +27,34 @@ init_rust()
 
 build_rust()
 {
-  git clone https://github.com/l4re/rust
+  git clone https://github.com/l4re/rust                                -b 1.86.0-l4re
   cd rust
-  git clone https://github.com/l4re/rust-libc-l4re libc+l4re -b l4re
-  git clone https://github.com/l4re/rust-cc-rs-l4re src/bootstrap/cc-rs+l4re -b l4re
+  git clone https://github.com/l4re/rust-libc-l4re  libc                -b 1.86.0-l4re
+  git clone https://github.com/l4re/rust-cc-rs-l4re src/bootstrap/cc-rs -b 1.86.0-l4re
+
+  (cd src/bootstrap/cc-rs && cargo run -p gen-target-info)
+
+  sed -i 's/^cc = .*/cc = { path = "cc-rs" }/' src/bootstrap/Cargo.toml
+  echo 'libc = { path = "../libc" }' >> library/Cargo.toml
+  sed -i 's/libc = { */libc = { path = "..\/..\/libc", /' library/std/Cargo.toml
 
   ./x.py check
 
-  echo 'profile = "library"' > config.toml
-  echo 'change-id = 135729' >> config.toml
+  echo 'profile = "dist"' > config.toml
   echo '[build]' >> config.toml
   echo 'target = ["x86_64-unknown-linux-gnu", "x86_64-unknown-l4re-uclibc", "aarch64-unknown-l4re-uclibc"]' >> config.toml
+  echo 'optimized-compiler-builtins = false' >> config.toml
+  echo 'docs = false' >> config.toml
+  echo 'verbose = 1' >> config.toml
+  echo '[install]' >> config.toml
+  echo 'prefix = "dist"' >> config.toml
+  echo 'sysconfdir = "etc/"' >> config.toml
+  echo '[rust]' >> config.toml
+  echo 'strip = false' >> config.toml
+  echo 'incremental = true' >> config.toml
+  echo 'lto = "off"' >> config.toml
 
-  ./x.py build library --stage 2
-
+  ./x.py build --stage 2 library
   cd ..
 }
 
@@ -116,8 +130,10 @@ package_toolchain()
   rm -rf rust-l4re-toolchain
   cp -r rust/build/host/stage2/ rust-l4re-toolchain
 
-  cp l4re/build.amd64/sysroot/usr/lib/* rust-l4re-toolchain/lib/rustlib/x86_64-unknown-l4re-uclibc/lib/self-contained/
-  cp l4re/build.arm64/sysroot/usr/lib/* rust-l4re-toolchain/lib/rustlib/aarch64-unknown-l4re-uclibc/lib/self-contained/
+  cp -r l4re/build.amd64/sysroot/usr/lib/*   rust-l4re-toolchain/lib/rustlib/x86_64-unknown-l4re-uclibc/lib/self-contained/
+  cp -r l4re/build.amd64/sysroot/usr/include rust-l4re-toolchain/lib/rustlib/x86_64-unknown-l4re-uclibc/lib/self-contained/
+  cp -r l4re/build.arm64/sysroot/usr/lib/*   rust-l4re-toolchain/lib/rustlib/aarch64-unknown-l4re-uclibc/lib/self-contained/
+  cp -r l4re/build.arm64/sysroot/usr/include rust-l4re-toolchain/lib/rustlib/aarch64-unknown-l4re-uclibc/lib/self-contained/
 
   chmod -R og=u-w rust-l4re-toolchain
   tar -cJv --owner l4re --group rust -f rust-l4re-toolchain.tar.xz rust-l4re-toolchain

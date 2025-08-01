@@ -182,6 +182,7 @@ kernel fiasco -serial_esc
 roottask moe rom/hello_world.cfg
 module l4re
 module ned
+module libld-l4.so
 module hello_world.cfg
 module hello_world
 _EOF
